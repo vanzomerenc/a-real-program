@@ -1,5 +1,13 @@
 .syntax unified
 
+FGPIOC = 0xF8000080
+FGPIO.PDOR = 0x00
+FGPIO.PSOR = 0x04
+FGPIO.PCOR = 0x08
+FGPIO.PTOR = 0x0C
+FGPIO.PDIR = 0x10
+FGPIO.PDDR = 0x14
+
 .section .vectors
     .word _estack           @  0    SP
     .word 1 + pc            @  1    PC
@@ -78,10 +86,13 @@
 
 
 .thumb_func
+.func
 fault:
     b fault
+.endfunc
 
 .thumb_func
+.func
 pc:
     @@@@@
     @ Disable watchdog.
@@ -165,10 +176,10 @@ _loop_MCG_PEE:
     @ Teensy's status LED is on pin 13, which is PTC6 (PORTC_6).
     @@@@@
 
-    ldr  r0, =0xF8000080    @ FGPIOC_x base
+    ldr  r0, =FGPIOC
 
-    ldr  r1, =0x00000020    @ pin(5)
-    str  r1, [r0, #0x14]    @ FGPIOC_PDDR
+    ldr  r1, =(1 << 5)
+    str  r1, [r0, #FGPIO.PDDR]
 
     @@@@@
     @ Configure pin functions.
@@ -183,11 +194,10 @@ _loop_MCG_PEE:
     @ Blinky blinky.
     @@@@@
 
-    ldr  r0, =0xF8000080
-    ldr  r1, =0x00000020    @ pin(5)
-    str  r1, [r0, #0x0C]    @ FGPIOC_PTOR
+    bl   morse_init
+
 _loop_blink:
-    ldr  r2, =2400000
+    ldr  r2, =600000
 _loop_delay:
     nop
     nop
@@ -198,5 +208,23 @@ _loop_delay:
     nop
     subs r2, #1
     bgt  _loop_delay
-    str  r1, [r0, #0x0C]    @ FGPIOC_PTOR
+    bl   morse_tx_handler
     b    _loop_blink
+.endfunc
+
+.text
+
+.global morse_pin_write
+.thumb_func
+.func
+morse_pin_write:
+    mov  r3, lr
+    ldr  r2, =FGPIOC
+    movs r1, #(1 << 5)
+    cmp  r0, #0
+    bne  1f
+    str  r1, [r2, #FGPIO.PCOR]
+    bx   r3
+1:  str  r1, [r2, #FGPIO.PSOR]
+    bx   r3
+.endfunc
