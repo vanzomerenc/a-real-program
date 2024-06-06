@@ -218,13 +218,12 @@ _loop_delay:
 .thumb_func
 .func
 morse_pin_write:
-    mov  r3, lr
     ldr  r2, =FGPIOC
     movs r1, #(1 << 5)
     cmp  r0, #0
     bne  1f
     str  r1, [r2, #FGPIO.PCOR]
-    bx   r3
+    mov  pc, lr
 1:  str  r1, [r2, #FGPIO.PSOR]
-    bx   r3
+    mov  pc, lr
 .endfunc

@@ -130,8 +130,7 @@ morse_init:
     strb r0, [r3, #morse_state.letter]
     movs r0, #0
     strb r0, [r3, #morse_state.pulse]
-    mov  r3, lr
-    bx   r3
+    mov  pc, lr
 .endfunc
 
 morse_conv_ranges:
