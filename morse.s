@@ -78,8 +78,7 @@ morse_tx_handler:
     movs r0, #0
     bcc  5f                             @ carry was set/cleared by lsrs
     movs r0, #1
-5:  ldr  r3, =(1 + morse_pin_write)
-    bx   r3                             @ tail call
+5:  b    morse_pin_write                @ tail call
 .endfunc
 
 .global morse_init
