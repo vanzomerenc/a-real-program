@@ -86,52 +86,38 @@ morse_tx_handler:
 .thumb_func
 .func
 morse_init:
-    ldr  r3, =morse_buffer
-    movs r0, #(1 << 4 | 0b0000)
-    strb r0, [r3, #0]
-    movs r0, #(1 << 1 | 0b0)
-    strb r0, [r3, #1]
-    movs r0, #(1 << 4 | 0b0010)
-    strb r0, [r3, #2]
-    movs r0, #(1 << 4 | 0b0010)
-    strb r0, [r3, #3]
-    movs r0, #(1 << 3 | 0b111)
-    strb r0, [r3, #4]
-    movs r0, 0
-    strb r0, [r3, #5]
-    movs r0, #(1 << 3 | 0b110)
-    strb r0, [r3, #6]
-    movs r0, #(1 << 3 | 0b111)
-    strb r0, [r3, #7]
-    movs r0, #(1 << 3 | 0b010)
-    strb r0, [r3, #8]
-    movs r0, #(1 << 4 | 0b0010)
-    strb r0, [r3, #9]
-    movs r0, #(1 << 3 | 0b001)
-    strb r0, [r3, #10]
-    movs r0, 0
-    strb r0, [r3, #11]
-    movs r0, 0
-    strb r0, [r3, #12]
-    movs r0, 0
-    strb r0, [r3, #13]
-    movs r0, 0
-    strb r0, [r3, #14]
-    movs r0, 0
-    strb r0, [r3, #15]
-    ldr  r3, =morse_state
     movs r0, #0
-    strb r0, [r3, #morse_state.start]
-    movs r0, #16
-    strb r0, [r3, #morse_state.end]
-    movs r0, #0
-    strb r0, [r3, #morse_state.cur]
-    movs r0, #0
-    strb r0, [r3, #morse_state.letter]
-    movs r0, #0
-    strb r0, [r3, #morse_state.pulse]
-    mov  pc, lr
+    ldr  r2, =morse_message_len
+    ldr  r1, =morse_state
+    strb r0, [r1, #morse_state.start]
+    strb r2, [r1, #morse_state.end]
+    strb r0, [r1, #morse_state.cur]
+    strb r0, [r1, #morse_state.letter]
+    strb r0, [r1, #morse_state.pulse]
+    ldr  r1, =morse_message
+    ldr  r0, =morse_buffer
+    b    memcpy                         @ tail call
 .endfunc
+
+morse_message:
+    .byte (1 << 4 | 0b0000)
+    .byte (1 << 1 | 0b0)
+    .byte (1 << 4 | 0b0010)
+    .byte (1 << 4 | 0b0010)
+    .byte (1 << 3 | 0b111)
+    .byte 0
+    .byte (1 << 3 | 0b110)
+    .byte (1 << 3 | 0b111)
+    .byte (1 << 3 | 0b010)
+    .byte (1 << 4 | 0b0010)
+    .byte (1 << 3 | 0b001)
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+    .byte 0
+morse_message_end:
+morse_message_len = morse_message_end - morse_message
 
 morse_conv_ranges:
     .byte 0x30

@@ -3,7 +3,7 @@ SHELL = /bin/sh
 .PHONY: clean dump-elf dump-hex
 
 toolchain = arm-none-eabi-
-objects = main.o morse.o
+objects = main.o morse.o string.o
 ldscript = program.ld
 
 LD = $(toolchain)ld
@@ -18,7 +18,7 @@ LDFLAGS = -T $(ldscript)
 program.hex : program.elf
 > $(OBJCOPY) -O ihex $< $@
 
-program.elf : main.o morse.o
+program.elf : main.o morse.o string.o
 > $(LD) $(LDFLAGS) -o $@ $^ $(LOADLIBES) $(LDLIBS) 
 
 clean:
