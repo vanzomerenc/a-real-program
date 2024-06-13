@@ -1,3 +1,5 @@
+#include "errno.h"
+
 .syntax unified
 
 
@@ -115,12 +117,12 @@ morse_write:            @ message, length -> errorcode
 
     @ Check message length.
     @ Don't allow messages which are so long that they make it difficult to queue future messages.
-    ldr  r0, =EMSGSIZE
+    movs r0, #EMSGSIZE
     cmp  r1, #(256 / 5)                 @ 4 existing messages, plus one we're adding.
     bhi  1f
 
     @ Check for space in morse_buffer.
-    ldr  r0, =EAGAIN
+    movs r0, #EAGAIN
     ldrb r2, [r3, #morse_state.start]   @ -.
     subs r2, r2, r4                     @  |  (start - end) % 256, except 0
     subs r2, r2, #1                     @  |- How much of the buffer will NOT be repeated.

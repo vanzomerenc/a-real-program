@@ -1,12 +1,7 @@
+#include "kl26.h"
+
 .syntax unified
 
-FGPIOC = 0xF8000080
-FGPIO.PDOR = 0x00
-FGPIO.PSOR = 0x04
-FGPIO.PCOR = 0x08
-FGPIO.PTOR = 0x0C
-FGPIO.PDIR = 0x10
-FGPIO.PDDR = 0x14
 
 .section .vectors
     .word _estack           @  0    SP
@@ -132,11 +127,10 @@ pc:
     movs r1, #0b10100000    @ CLKS(2) | FRDIV(4)            OSCCLK => MCGOUTCLK, OSCCLK / 512 (31.25kHz) => FLL input
     strb r1, [r0, #0]       @ MCG_C1
     movs r2, #0b00011110    @ IREFST | CLKST | OSCINIT0     status mask
-_loop_MCG_FBE:
-    ldrb r1, [r0, #6]       @ MCG_S
+1:  ldrb r1, [r0, #6]       @ MCG_S
     ands r1, r2
     cmp  r1, #0b00001010    @ CLKST(2) | OSCINIT0           desired status
-    bne  _loop_MCG_FBE
+    bne  1b
 
                             @ Transition from FBE to PBE mode.
     movs r1, #0b00000011    @ PRDIV0(3)                     OSCCLK / 4 (4MHz) => PLL input
@@ -144,19 +138,17 @@ _loop_MCG_FBE:
     movs r1, #0b01000000    @ PLLS                          PLL input * 24 (96MHz) => PLL output, switch from FLL to PLL
     strb r1, [r0, #5]       @ MCG_C6
     movs r2, #0b01100000    @ LOCK0 | PLLST                 status mask, desired set
-_loop_MCG_PBE:
-    ldrb r1, [r0, #6]       @ MCG_S
+1:  ldrb r1, [r0, #6]       @ MCG_S
     tst  r1, r2
-    beq  _loop_MCG_PBE
+    beq  1b
 
                             @ Transition from PBE to PEE mode.
     movs r1, #0b00100000    @ FRDIV(4)                      PLL => MCGOUTCLK, don't change FRDIV
     strb r1, [r0, #0]       @ MCG_C1
     movs r2, #0b00001100    @ CLKST                         status mask, desired set
-_loop_MCG_PEE:
-    ldrb r1, [r0, #6]       @ MCG_S
+1:  ldrb r1, [r0, #6]       @ MCG_S
     tst  r1, r2
-    beq  _loop_MCG_PEE
+    beq  1b
 
     @@@@@
     @ Configure module clocks.
@@ -179,7 +171,7 @@ _loop_MCG_PEE:
     ldr  r0, =FGPIOC
 
     ldr  r1, =(1 << 5)
-    str  r1, [r0, #FGPIO.PDDR]
+    str  r1, [r0, #FGPIO_PDDR]
 
     @@@@@
     @ Configure pin functions.
@@ -196,10 +188,8 @@ _loop_MCG_PEE:
 
     bl   morse_init
 
-_loop_blink:
-    ldr  r2, =600000
-_loop_delay:
-    nop
+2:  ldr  r2, =600000
+1:  nop
     nop
     nop
     nop
@@ -207,9 +197,9 @@ _loop_delay:
     nop
     nop
     subs r2, #1
-    bgt  _loop_delay
+    bgt  1b
     bl   morse_tx_handler
-    b    _loop_blink
+    b    2b
 .endfunc
 
 .text
@@ -222,8 +212,8 @@ morse_pin_write:
     movs r1, #(1 << 5)
     cmp  r0, #0
     bne  1f
-    str  r1, [r2, #FGPIO.PCOR]
+    str  r1, [r2, #FGPIO_PCOR]
     mov  pc, lr
-1:  str  r1, [r2, #FGPIO.PSOR]
+1:  str  r1, [r2, #FGPIO_PSOR]
     mov  pc, lr
 .endfunc

@@ -3,7 +3,7 @@ SHELL = /bin/sh
 .PHONY: clean dump-elf dump-hex
 
 toolchain = arm-none-eabi-
-objects = main.o morse.o string.o errno.o
+objects = main.o morse.o string.o
 ldscript = program.ld
 
 LD = $(toolchain)ld

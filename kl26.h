@@ -1,0 +1,7 @@
+#define FGPIOC 0xF8000080
+#define FGPIO_PDOR 0x00
+#define FGPIO_PSOR 0x04
+#define FGPIO_PCOR 0x08
+#define FGPIO_PTOR 0x0C
+#define FGPIO_PDIR 0x10
+#define FGPIO_PDDR 0x14
