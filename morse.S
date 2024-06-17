@@ -186,9 +186,9 @@ morse_convert:           @ ascii_char -> morse_char
     subs r0, r0, #0x20                  @ It is. Convert to upper-case.
 2:  ldr  r3, =morse_conv_bits           @ -._
     ldrb r0, [r3, r0]                   @ -'  Load from table.
-    mov  pc, lr
+    bx   lr
 1:  movs r0, #0                         @ Not in range.
-    mov pc, lr
+    bx   lr
 .endfunc
 
 morse_message:

@@ -213,7 +213,7 @@ morse_pin_write:
     cmp  r0, #0
     bne  1f
     str  r1, [r2, #GPIO_PCOR]
-    mov  pc, lr
+    bx   lr
 1:  str  r1, [r2, #GPIO_PSOR]
-    mov  pc, lr
+    bx   lr
 .endfunc

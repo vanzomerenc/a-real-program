@@ -10,7 +10,7 @@
 memcpy:                 @ dst, src, count
     subs r2, #1
     bhs  1b
-    mov  pc, lr
+    bx   lr
 .endfunc
 
 .global memset
@@ -20,5 +20,5 @@ memcpy:                 @ dst, src, count
 memset:                 @ dst, val, count
     subs r2, #1
     bhs  1b
-    mov  pc, lr
+    bx   lr
 .endfunc
