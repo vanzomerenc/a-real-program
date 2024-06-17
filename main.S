@@ -93,7 +93,7 @@ pc:
     @ Disable watchdog.
     @@@@@
 
-    ldr  r0, =0x40048100    @ SIM_COPC
+    ldr  r0, =SIM_COPC
     movs r1, #0             @ disabled
     str  r1, [r0]
 
@@ -114,39 +114,39 @@ pc:
     @@@@@
 
 
-                            @ Configure external oscillator.
-    ldr  r0, =0x40065000    @ OSC0_CR
-    movs r1, #0b10001010    @ ERCLKEN | SC2P | SC8P         OSCCLK => OSCERCLK, use 10pF load for osc.
+    @ Configure external oscillator.
+    ldr  r0, =OSC0_CR
+    movs r1, #0b10001010    @ ERCLKEN | SC2P | SC8P     OSCCLK => OSCERCLK, use 10pF load for osc.
     strb r1, [r0, #0]
 
-    ldr  r0, =0x40064000    @ MCG_x base
+    ldr  r0, =MCG
 
-                            @ Transition from FEI to FBE mode.
-    movs r1, #0b00100100    @ RANGE0(2) | EREFS0            very high freq. osc. (16MHz) => OSCCLK
-    strb r1, [r0, #1]       @ MCG_C2
-    movs r1, #0b10100000    @ CLKS(2) | FRDIV(4)            OSCCLK => MCGOUTCLK, OSCCLK / 512 (31.25kHz) => FLL input
-    strb r1, [r0, #0]       @ MCG_C1
-    movs r2, #0b00011110    @ IREFST | CLKST | OSCINIT0     status mask
-1:  ldrb r1, [r0, #6]       @ MCG_S
+    @ Transition from FEI to FBE mode.
+    movs r1, #0b00100100            @ RANGE0(2) | EREFS0    very high freq. osc. (16MHz) => OSCCLK
+    strb r1, [r0, #(MCG_C2 - MCG)]
+    movs r1, #0b10100000            @ CLKS(2) | FRDIV(4)    OSCCLK => MCGOUTCLK, / 512 => FLL input
+    strb r1, [r0, #(MCG_C1 - MCG)]
+    movs r2, #0b00011110            @ IREFST | CLKST | OSCINIT0     status mask
+1:  ldrb r1, [r0, #(MCG_S - MCG)]
     ands r1, r2
-    cmp  r1, #0b00001010    @ CLKST(2) | OSCINIT0           desired status
+    cmp  r1, #0b00001010            @ CLKST(2) | OSCINIT0   desired status
     bne  1b
 
-                            @ Transition from FBE to PBE mode.
-    movs r1, #0b00000011    @ PRDIV0(3)                     OSCCLK / 4 (4MHz) => PLL input
-    strb r1, [r0, #4]       @ MCG_C5
-    movs r1, #0b01000000    @ PLLS                          PLL input * 24 (96MHz) => PLL output, switch from FLL to PLL
-    strb r1, [r0, #5]       @ MCG_C6
-    movs r2, #0b01100000    @ LOCK0 | PLLST                 status mask, desired set
-1:  ldrb r1, [r0, #6]       @ MCG_S
+    @ Transition from FBE to PBE mode.
+    movs r1, #0b00000011            @ PRDIV0(3)             OSCCLK / 4 (4MHz) => PLL input
+    strb r1, [r0, #(MCG_C5 - MCG)]
+    movs r1, #0b01000000            @ PLLS                  PLL input * 24 => PLL output, use PLL
+    strb r1, [r0, #(MCG_C6 - MCG)]
+    movs r2, #0b01100000            @ LOCK0 | PLLST         status mask, desired set
+1:  ldrb r1, [r0, #(MCG_S - MCG)]
     tst  r1, r2
     beq  1b
 
-                            @ Transition from PBE to PEE mode.
-    movs r1, #0b00100000    @ FRDIV(4)                      PLL => MCGOUTCLK, don't change FRDIV
-    strb r1, [r0, #0]       @ MCG_C1
-    movs r2, #0b00001100    @ CLKST                         status mask, desired set
-1:  ldrb r1, [r0, #6]       @ MCG_S
+    @ Transition from PBE to PEE mode.
+    movs r1, #0b00100000            @ FRDIV(4)              PLL => MCGOUTCLK, don't change FRDIV
+    strb r1, [r0, #(MCG_C1 - MCG)]
+    movs r2, #0b00001100            @ CLKST                 status mask, desired set
+1:  ldrb r1, [r0, #(MCG_S - MCG)]
     tst  r1, r2
     beq  1b
 
@@ -154,14 +154,14 @@ pc:
     @ Configure module clocks.
     @@@@@
 
-    ldr  r0, =0x40048000    @ SIM_x base + 0x1000
+    ldr  r0, =SIM
 
-    ldr  r1, =0x00050000    @ USBSRC | PLLFLLSEL            PLL / 2 (48MHz) => USB clock
-    str  r1, [r0, #4]       @ SIM_SOPT2
-    ldr  r1, =0xF0040000    @ USBOTG                        USB clock gate enabled
-    str  r1, [r0, #0x34]    @ SIM_SCGC4
-    ldr  r1, =0x00000982    @ PORTC | <reserved fields>     PORTC clock gate enabled
-    str  r1, [r0, #0x38]    @ SIM_SCGC5
+    ldr  r1, =0x00050000                @ USBSRC | PLLFLLSEL            PLL / 2 (48MHz) => USB clock
+    str  r1, [r0, #(SIM_SOPT2 - SIM)]
+    ldr  r1, =0xF0040000                @ USBOTG                        USB clock gate enabled
+    str  r1, [r0, #(SIM_SCGC4 - SIM)]
+    ldr  r1, =0x00000982                @ PORTC | <reserved fields>     PORTC clock gate enabled
+    str  r1, [r0, #(SIM_SCGC5 - SIM)]
 
     @@@@@
     @ Configure GPIO.
@@ -171,16 +171,16 @@ pc:
     ldr  r0, =FGPIOC
 
     ldr  r1, =(1 << 5)
-    str  r1, [r0, #FGPIO_PDDR]
+    str  r1, [r0, #GPIO_PDDR]
 
     @@@@@
     @ Configure pin functions.
     @@@@@
 
-    ldr  r0, =0x4004B000    @ PORTC_PCRx base
+    ldr  r0, =PORTC
 
     ldr  r1, =0x00000104    @ MUX(1) | SRE                  use as GPIO, limit slew rate
-    str  r1, [r0, #0x14]    @ PORTC_PCR5
+    str  r1, [r0, #PCR(5)]
 
     @@@@@
     @ Blinky blinky.
@@ -212,8 +212,8 @@ morse_pin_write:
     movs r1, #(1 << 5)
     cmp  r0, #0
     bne  1f
-    str  r1, [r2, #FGPIO_PCOR]
+    str  r1, [r2, #GPIO_PCOR]
     mov  pc, lr
-1:  str  r1, [r2, #FGPIO_PSOR]
+1:  str  r1, [r2, #GPIO_PSOR]
     mov  pc, lr
 .endfunc
