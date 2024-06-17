@@ -1,3 +1,41 @@
+/*                                      */
+/*                                      */
+/* ARMv6M Architecture Reference Manual */
+/*                                      */
+/*                                      */
+
+#define ACTLR       0xE000E008
+
+#define SYST_CSR    0xE000E010
+#define SYST_RVR    0xE000E014
+#define SYST_CVR    0xE000E018
+#define SYST_CALIB  0xE000E01C
+
+#define NVIC_ISER   0xE000E100
+#define NVIC_ICER   0xE000E180
+#define NVIC_ISPR   0xE000E200
+#define NVIC_ICPR   0xE000E280
+#define NVIC_IPR(x) (0xE000E400 + ((x) << 2))
+
+#define CPUID       0xE000ED00
+#define ICSR        0xE000ED04
+#define VTOR        0xE000ED08
+#define AIRCR       0xE000ED0C
+
+#define SCR         0xE000ED10
+#define CCR         0xE000ED14
+#define SHPR2       0xE000ED1C
+#define SHPR3       0xE000ED20
+
+#define SHCSR       0xE000ED24
+#define DFSR        0xE000ED30
+
+/*                                  */
+/*                                  */
+/* KL26 Sub-Family Reference Manual */
+/*                                  */
+/*                                  */
+
 /*                                               */
 /* Chapter 11: Port control and interrupt (PORT) */
 /*                                               */

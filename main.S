@@ -20,7 +20,7 @@
     .word 1 + fault         @ 12    -
     .word 1 + fault         @ 13    -
     .word 1 + fault         @ 14    PendSV
-    .word 1 + fault         @ 15    SysTick
+    .word 1 + systick_isr   @ 15    SysTick
 
     .word 1 + fault         @ 16    DMA channel 0
     .word 1 + fault         @ 17    DMA channel 1
@@ -183,23 +183,34 @@ pc:
     str  r1, [r0, #PCR(5)]
 
     @@@@@
-    @ Blinky blinky.
+    @ Init message loop.
     @@@@@
 
     bl   morse_init
 
-2:  ldr  r2, =600000
-1:  nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    nop
-    subs r2, #1
-    bgt  1b
-    bl   morse_tx_handler
-    b    2b
+    @@@@@
+    @ Configure SysTick timer for periodic interrupt.
+    @@@@@
+
+    ldr  r0, =SYST_CSR
+    ldr  r1, =4800000                       @ 100ms
+    str  r1, [r0, #(SYST_RVR - SYST_CSR)]
+    str  r0, [r0, #(SYST_CVR - SYST_CSR)]   @ clear counter, write value is ignored
+    movs r1, #0x7                           @ COUNTFLAG | TICKINT | ENABLE  proc. clk., int., en.
+    str  r1, [r0, #(SYST_CSR - SYST_CSR)]
+
+    @@@@@
+    @ Blinky blinky.
+    @@@@@
+
+1:  wfi
+    b    1b
+.endfunc
+
+.thumb_func
+.func
+systick_isr:
+    b    morse_tx_handler
 .endfunc
 
 .text
