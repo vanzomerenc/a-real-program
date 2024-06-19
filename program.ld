@@ -25,19 +25,21 @@ SECTIONS
     } > flash = 0xFF
 
     . = ALIGN(4);
-    _sdata = .;
     .data : {
+        _sdata = .;
         *(.data)
+        _edata = .;
     } > ram AT> flash
-    _edata = .;
     _sdata_load = LOADADDR(.data);
+    _data_len = _edata - _sdata;
 
     . = ALIGN(4);
-    _sbss = .;
     .bss : {
+        _sbss = .;
         *(.bss)
+        _ebss = .;
     } > ram
-    _ebss = .;
+    _bss_len = _ebss - _sbss;
 
     _estack = ORIGIN(ram) + LENGTH(ram);
 }

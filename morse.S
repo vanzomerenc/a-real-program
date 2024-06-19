@@ -91,21 +91,6 @@ morse_tx_handler:
 5:  b    morse_pin_write                @ tail call
 .endfunc
 
-.global morse_init
-.thumb_func
-.func
-morse_init:
-    push {lr}
-    ldr  r0, =morse_state
-    movs r1, #0
-    ldr  r2, =morse_state_len
-    bl   memset
-    ldr  r0, =morse_message
-    ldr  r1, =morse_message_len
-    bl   morse_write
-    pop  {pc}
-.endfunc
-
 .global morse_write
 .thumb_func
 .func
@@ -190,11 +175,6 @@ morse_convert:           @ ascii_char -> morse_char
 1:  movs r0, #0                         @ Not in range.
     bx   lr
 .endfunc
-
-morse_message:
-    .asciz "YES THIS IS MORSE CODE   "
-morse_message_end:
-morse_message_len = morse_message_end - morse_message
 
 @ Conversion table from ASCII to Morse.
 @ This table contains all the digits 0-9 and letters A-Z, in order, along with some zero padding

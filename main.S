@@ -113,7 +113,6 @@ pc:
     @   Either way, that needs to be done before entering PEE mode.
     @@@@@
 
-
     @ Configure external oscillator.
     ldr  r0, =OSC0_CR
     movs r1, #0b10001010    @ ERCLKEN | SC2P | SC8P     OSCCLK => OSCERCLK, use 10pF load for osc.
@@ -151,6 +150,20 @@ pc:
     beq  1b
 
     @@@@@
+    @ Initialize global variables.
+    @@@@@
+
+    ldr  r0, =_sdata
+    ldr  r1, =_sdata_load
+    ldr  r2, =_data_len
+    bl   memcpy
+
+    ldr  r0, =_sbss
+    movs r1, #0
+    ldr  r2, =_bss_len
+    bl   memset
+
+    @@@@@
     @ Configure module clocks.
     @@@@@
 
@@ -183,10 +196,12 @@ pc:
     str  r1, [r0, #PCR(5)]
 
     @@@@@
-    @ Init message loop.
+    @ Prepare a message.
     @@@@@
 
-    bl   morse_init
+    ldr  r0, =morse_message
+    ldr  r1, =morse_message_len
+    bl   morse_write
 
     @@@@@
     @ Configure SysTick timer for periodic interrupt.
@@ -228,3 +243,8 @@ morse_pin_write:
 1:  str  r1, [r2, #GPIO_PSOR]
     bx   lr
 .endfunc
+
+morse_message:
+    .asciz "I AM A LITTLE TEA POT    "
+morse_message_end:
+morse_message_len = morse_message_end - morse_message
