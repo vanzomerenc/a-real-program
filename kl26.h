@@ -129,6 +129,47 @@
 
 #define OSC0_CR     0x40065000
 
+/*                                                          */
+/* Chapter 35: Universal Serial Bus OTG Controller (USBOTG) */
+/*                                                          */
+
+#define USB0_PERID      0x40072000
+#define USB0_IDCOMP     0x40072004
+#define USB0_REV        0x40072008
+#define USB0_ADDINFO    0x4007200C
+
+#define USB0_OTGISTAT   0x40072010
+#define USB0_OTGICR     0x40072014
+#define USB0_OTGSTAT    0x40072018
+#define USB0_OTGCTL     0x4007201C
+
+#define USB0_ISTAT      0x40072080
+#define USB0_INTEN      0x40072084
+#define USB0_ERRSTAT    0x40072088
+#define USB0_ERREN      0x4007208C
+
+#define USB0_STAT       0x40072090
+#define USB0_CTL        0x40072094
+#define USB0_ADDR       0x40072098
+#define USB0_BDTPAGE1   0x4007209C
+
+#define USB0_FRMNUML    0x400720A0
+#define USB0_FRMNUMH    0x400720A4
+#define USB0_TOKEN      0x400720A8
+#define USB0_SOFTHLD    0x400720AC
+
+#define USB0_BDTPAGE2   0x400720B0
+#define USB0_BDTPAGE3   0x400720B4
+
+#define USB0_ENDPT(x)   (0x400720C0 + ((x) << 2))
+
+#define USB0_USBCTRL    0x40072100
+#define USB0_OBSERVE    0x40072104
+#define USB0_CONTROL    0x40072108
+#define USB0_USBTRC0    0x4007210C
+
+#define USB0_USBFRMADJUST   0x40072114
+
 /*                                                 */
 /* Chapter 42: General-purpose input/output (GPIO) */
 /*                                                 */

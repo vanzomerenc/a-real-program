@@ -49,7 +49,7 @@
     .word 1 + fault         @ 38    PIT
     .word 1 + fault         @ 39    I2S0
 
-    .word 1 + fault         @ 40    USB OTG
+    .word 1 + usb_isr       @ 40    USB OTG
     .word 1 + fault         @ 41    DAC0
     .word 1 + fault         @ 42    TSI0
     .word 1 + fault         @ 43    MCG
@@ -196,14 +196,6 @@ pc:
     str  r1, [r0, #PCR(5)]
 
     @@@@@
-    @ Prepare a message.
-    @@@@@
-
-    ldr  r0, =morse_message
-    ldr  r1, =morse_message_len
-    bl   morse_write
-
-    @@@@@
     @ Configure SysTick timer for periodic interrupt.
     @@@@@
 
@@ -218,6 +210,8 @@ pc:
     @ Blinky blinky.
     @@@@@
 
+    bl   usb_init
+
 1:  wfi
     b    1b
 .endfunc
@@ -226,6 +220,14 @@ pc:
 .func
 systick_isr:
     b    morse_tx_handler
+.endfunc
+
+.thumb_func
+.func
+usb_isr:
+    ldr  r0, =usb_message
+    ldr  r1, =usb_message_len
+    b    morse_write
 .endfunc
 
 .text
@@ -244,7 +246,7 @@ morse_pin_write:
     bx   lr
 .endfunc
 
-morse_message:
-    .asciz "I AM A LITTLE TEA POT    "
-morse_message_end:
-morse_message_len = morse_message_end - morse_message
+usb_message:
+    .asciz "USB Interrupted          "
+usb_message_end:
+usb_message_len = usb_message_end - usb_message
