@@ -7,9 +7,9 @@
 @ The 4 most recent messages in this buffer will be transmitted continuously.
 
 .bss
-.align 2
+.balign 4
 morse_buffer:       .zero 1 << 8        @ Making this exactly this long simplifies so many things.
-.align 2
+.balign 4
 morse_state:        .zero morse_state_len
 
 @ State/control information related to this buffer:
