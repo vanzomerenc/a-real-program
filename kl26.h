@@ -46,7 +46,7 @@
 #define PORTD       0x4004C000
 #define PORTE       0x4004D000
 
-#define PCR(x)      (x << 2)
+#define PCR(x)      ((x) << 2)
 #define GPCLR       0x80
 #define GPCHR       0x84
 #define ISFR        0xA0
