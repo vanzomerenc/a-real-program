@@ -57,6 +57,9 @@ morse_tx_handler:
     cmp  r1, r2                         @  |- Did cursor hit end of most recent message?
     bne  4f                             @ -'
     ldrb r1, [r3, #morse_state.start]   @ Wrap to beginning of least recent message.
+4:  cmp  r0, r2                         @ -._
+    bne  4f                             @ -'  Was cursor already on end of most recent message?
+    ldrb r1, [r3, #morse_state.start]   @ Wrap to beginning of least recent message.
 4:  strb r1, [r3, #morse_state.cursor]
 
     @ Get the letter at the old value of the cursor.
