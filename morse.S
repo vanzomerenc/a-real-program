@@ -131,7 +131,7 @@ morse_write:            @ message, length -> errorcode
     @ It's unlikely, but if we're near the cursor this can be the difference between instantly
     @ seeing the new message, or spending several seconds (and a fair amount of buffer space)
     @ retransmitting existing messages.
-    lsrs r2, r4, 24
+    lsrs r2, r4, #24
     strb r2, [r3, #morse_state.start]
 
     @ Copy letters from message to morse_buffer, changing encoding along the way.
@@ -152,7 +152,7 @@ morse_write:            @ message, length -> errorcode
     ldr  r3, =morse_state
     adds r1, r1, r4                     @ -._
     uxtb r1, r1                         @ -'  Calculate new end.
-    lsls r4, r4, 8                      @ -.
+    lsls r4, r4, #8                     @ -.
     orrs r4, r4, r1                     @  |- Update buffer end location and transition locations.
     str  r4, [r3, #morse_state.end]     @ -'
 
