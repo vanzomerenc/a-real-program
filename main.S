@@ -231,6 +231,12 @@ usb_isr:
     ldr  r1, =usb_message_prefix
     ldr  r2, =usb_message_len
     bl   print_string
+    ldr  r3, =evt_ct
+    ldr  r1, [r3]
+    adds r1, r1, #1
+    str  r1, [r3]
+    bl   print_word
+    bl   print_space
     ldr  r1, =USB0_ISTAT
     ldrb r1, [r1]
     bl   print_byte
@@ -268,3 +274,5 @@ usb_message:
     .zero 32
 usb_message_end:
 usb_message_len = usb_message_end - usb_message
+
+evt_ct: .word 0
