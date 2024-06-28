@@ -117,14 +117,14 @@ morse_write:            @ message, length -> errorcode
     uxtb r2, r2                         @  |
     adds r2, r2, #1                     @ -'
     cmp  r1, r2                         @ -._ Does new message fit?
-    bhi  1f                             @ -'
+    bhs  1f                             @ -'
     ldrb r2, [r3, #morse_state.cursor]  @ -.
     subs r2, r2, r4                     @  |  (cursor - end) % 256, except 0
     subs r2, r2, #1                     @  |- How much of the buffer is NOT queued already.
     uxtb r2, r2                         @  |  cursor may change at any time, but that is ok.
     adds r2, r2, #1                     @ -'
     cmp  r1, r2                         @ -._
-    bhi  1f                             @ -'  Does new message fit?
+    bhs  1f                             @ -'  Does new message fit?
 
     @ We know the new message will be added successfully.
     @ Update buffer start location promptly to reduce time wasted repeating old messages.
