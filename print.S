@@ -16,26 +16,35 @@
 
 .text
 
+@ End a sequence of `print_` calls.
+@ This adds the last NUL byte and prepares registers for a subsequent memcpy.
+.global print_end
+.thumb_func
+.func
+print_end:                      @ msg_end, bufsz, (bufsz - msgsz) -> -, msg, msgsz
+    push {r4, lr}
+    movs r4, r1                 @ Make r1 available for argument
+    movs r1, #0                 @ -._ Write NUL char
+    bl   print_char_unsafe      @ -'
+    subs r2, r4, r2             @ msgsz === bufsz - (bufsz - msgsz)
+    subs r1, r0, r2             @ msg === msg_end - msgsz
+    pop  {r4, pc}
+.endfunc
+
 .global print_space
 .global print_char
 .thumb_func
 .func
-print_space:
+print_space:                    @ dst, -, dstsz -> dst, (' ' or NUL), dstsz
     movs r1, #' '
-    @ fall-through to print_char
 print_char:                     @ dst, char, dstsz -> dst, (char or NUL), dstsz
-    cmp  r2, #1                 @ -._ Out of space? (leave 1 extra byte for NUL char)
-    bls  1f                     @ -'
+    cmp  r2, #1                 @ -._
+    bls  1f                     @ -'  Out of space? (leave 1 extra byte for NUL char)
+print_char_unsafe:
     strb r1, [r0]               @ Copy to output
     adds r0, #1                 @ -._
     subs r2, #1                 @ -'  Advance dst
-    bx   lr
-1:  blo  2f                     @ Out of space. No room for NUL char?
-    movs r1, #0                 @ -._
-    strb r1, [r0]               @ -'  Write NUL char
-    adds r0, #1                 @ -._
-    subs r2, #1                 @ -'  Advance dst
-2:  bx   lr
+1:  bx   lr
 .endfunc
 
 
@@ -77,10 +86,10 @@ print_byte:                     @ dst, byte, dstsz -> dst, (char or NUL), dstsz
 .balign 8
 hexencode_table: .ascii "0123456789ABCDEF"
 
-.global print_bytearray
+.global print_byte_array
 .thumb_func
 .func
-print_bytearray:                @ dst, src, dstsz, srcsz -> dst, src, dstsz, srcsz
+print_byte_array:               @ dst, src, dstsz, srcsz -> dst, src, dstsz, srcsz
     push {r4, r5, lr}
     movs r4, r1                 @ Make r1 available for argument
     movs r5, r3                 @ Make r3 available for scratch

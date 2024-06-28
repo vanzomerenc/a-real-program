@@ -234,12 +234,13 @@ usb_isr:
     ldr  r1, =USB0_ISTAT
     ldrb r1, [r1]
     bl   print_byte
-    ldr  r1, =0
-    bl   memset
-
-    ldr  r0, =usb_message
     ldr  r1, =usb_message_len
+    bl   print_end
+
+    movs r0, r1
+    movs r1, r2
     bl   morse_write
+
     pop  {pc}
 .endfunc
 
