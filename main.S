@@ -225,9 +225,22 @@ systick_isr:
 .thumb_func
 .func
 usb_isr:
+    push {lr}
+
+    ldr  r0, =usb_message
+    ldr  r1, =usb_message_prefix
+    ldr  r2, =usb_message_len
+    bl   print_string
+    ldr  r1, =USB0_ISTAT
+    ldrb r1, [r1]
+    bl   print_byte
+    ldr  r1, =0
+    bl   memset
+
     ldr  r0, =usb_message
     ldr  r1, =usb_message_len
-    b    morse_write
+    bl   morse_write
+    pop  {pc}
 .endfunc
 
 .text
@@ -246,7 +259,11 @@ morse_pin_write:
     bx   lr
 .endfunc
 
+usb_message_prefix:
+    .asciz "USB Events "
+
+.bss
 usb_message:
-    .asciz "USB Interrupted          "
+    .zero 32
 usb_message_end:
 usb_message_len = usb_message_end - usb_message
